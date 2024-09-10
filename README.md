@@ -1,2 +1,3 @@
 # EC444
-EC444 individual skills, 
+EC444 my individual skills, 
+#THIS CODE IS NOT FOR PUBLIC USE, PLEASE STEER CLEAR OF ACADEMIC DISHONESTY!
