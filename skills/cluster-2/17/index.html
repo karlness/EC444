@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script>
+window.onload = function () {
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+
+            // Adjust labels and parse JSON
+            var jsonAdjusted = this.responseText.replace(/Date/g, "x")
+                                                 .replace(/Stock/g, "label")
+                                                 .replace(/Closing/g, "y");
+            var graphData = JSON.parse(jsonAdjusted);
+
+            // Convert number strings to numbers and split json by company
+            graphData.forEach(row => {
+                row.x = parseInt(row.x);
+                row.y = parseInt(row.y);
+            });
+
+            var amazonData = graphData.filter(row => row.label === "AMZN").map(row => { delete row.label; return row; });
+            var googleData = graphData.filter(row => row.label === "GOOGL").map(row => { delete row.label; return row; });
+            var microsoftData = graphData.filter(row => row.label === "MSFT").map(row => { delete row.label; return row; });
+            var facebookData = graphData.filter(row => row.label === "FB").map(row => { delete row.label; return row; });
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                title: {
+                    text: "BIG COMPANIES STOCKS"
+                },
+                axisX: {
+                    interval: 1,
+                    title: "Date",
+                    prefix: "Day "
+                },
+                axisY: {
+                    title: "Closing",
+
+                },
+                toolTip: {
+                    shared: true
+                },
+                legend: {
+                    cursor: "pointer",
+                    verticalAlign: "top",
+                    horizontalAlign: "center",
+                    dockInsidePlotArea: true,
+                    itemclick: toggleDataSeries
+                },
+                data: [
+                    {
+                        type: "column",
+                        name: "AMZN",
+                        showInLegend: true,
+                        color: "red",
+                        dataPoints: amazonData
+                    },
+                    {
+                        type: "column",
+                        name: "GOOGL",
+                        showInLegend: true,
+                        color: "blue",
+                        dataPoints: googleData
+                    },
+                    {
+                        type: "column",
+                        name: "MSFT",
+                        showInLegend: true,
+                        color: "purple",
+                        dataPoints: microsoftData
+                    },
+                    {
+                        type: "column",
+                        name: "FB",
+                        showInLegend: true,
+                        color: "green",
+                        dataPoints: facebookData
+                    }
+                ]
+            });
+            
+            chart.render();
+        }
+    };
+
+    xhr.open("GET", '/data', true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send();
+
+    function toggleDataSeries(e) {
+        if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+            e.dataSeries.visible = false;
+        } else {
+            e.dataSeries.visible = true;
+        }
+        chart.render();
+    }
+
+}
+</script>
+</head>
+<body>
+<div id="chartContainer" style="height:400px; width: 100%;"></div>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+</html>
